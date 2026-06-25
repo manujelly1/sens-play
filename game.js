@@ -152,7 +152,8 @@
                   y: lotY + py * 0.5,
                   w: bw,
                   h: bh,
-                  tone: Math.floor(this.rand(xi + cx, yi + cy, 4) * 4)
+                  tone: Math.floor(this.rand(xi + cx, yi + cy, 4) * 4),
+                  height3D: 20 + Math.floor(this.rand(xi + cx, yi + cy, 5) * 26)
                 });
               }
             }
@@ -380,6 +381,91 @@
         return { x: x + minDistance, y };
       }
 
+      drawBuildingVolume(ctx, building) {
+        const palettes = [
+          {
+            roof: "#8f97a4",
+            roofDetail: "#a7afbb",
+            right: "#5f6672",
+            front: "#6d7480"
+          },
+          {
+            roof: "#96887d",
+            roofDetail: "#ad9c90",
+            right: "#645a53",
+            front: "#736760"
+          },
+          {
+            roof: "#84a0b3",
+            roofDetail: "#9ab5c6",
+            right: "#567181",
+            front: "#667f8e"
+          },
+          {
+            roof: "#9b8278",
+            roofDetail: "#b2998e",
+            right: "#6a5854",
+            front: "#796662"
+          }
+        ];
+
+        const palette = palettes[building.tone];
+        const height = building.height3D || 24;
+        const liftX = height * 0.42;
+        const liftY = height * 0.6;
+        const roofX = building.x - liftX;
+        const roofY = building.y - liftY;
+        const rightX = building.x + building.w;
+        const bottomY = building.y + building.h;
+
+        ctx.fillStyle = "rgba(0, 0, 0, 0.18)";
+        ctx.beginPath();
+        ctx.moveTo(rightX + 8, building.y + 10);
+        ctx.lineTo(rightX + 8 + liftX, building.y + 10 - liftY);
+        ctx.lineTo(rightX + 8 + liftX, bottomY + 10 - liftY);
+        ctx.lineTo(building.x + 8, bottomY + 10);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = palette.right;
+        ctx.beginPath();
+        ctx.moveTo(roofX + building.w, roofY);
+        ctx.lineTo(rightX, building.y);
+        ctx.lineTo(rightX, bottomY);
+        ctx.lineTo(roofX + building.w, roofY + building.h);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = palette.front;
+        ctx.beginPath();
+        ctx.moveTo(roofX, roofY + building.h);
+        ctx.lineTo(roofX + building.w, roofY + building.h);
+        ctx.lineTo(rightX, bottomY);
+        ctx.lineTo(building.x, bottomY);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = palette.roof;
+        ctx.fillRect(roofX, roofY, building.w, building.h);
+        ctx.fillStyle = palette.roofDetail;
+        ctx.fillRect(roofX + 8, roofY + 8, building.w - 16, building.h - 16);
+
+        ctx.fillStyle = "rgba(255, 245, 204, 0.24)";
+        const cols = Math.max(2, Math.floor(building.w / 28));
+        const rows = Math.max(2, Math.floor(building.h / 30));
+        for (let ix = 0; ix < cols; ix++) {
+          for (let iy = 0; iy < rows; iy++) {
+            const wallWx = building.x + 10 + ix * ((building.w - 22) / cols);
+            const wallWy = building.y + 10 + iy * ((building.h - 22) / rows);
+            ctx.fillRect(wallWx, wallWy, 7, 10);
+
+            const roofWx = roofX + 12 + ix * ((building.w - 26) / cols);
+            const roofWy = roofY + 12 + iy * ((building.h - 26) / rows);
+            ctx.fillRect(roofWx, roofWy, 6, 8);
+          }
+        }
+      }
+
       draw(ctx, camera) {
         ctx.fillStyle = "#3f6c4e";
         ctx.fillRect(0, 0, this.size, this.size);
@@ -419,30 +505,7 @@
 
         for (const building of this.buildings) {
           if (!this.game.rectInView(building.x, building.y, building.w, building.h, 80)) continue;
-          const palettes = [
-            ["#717989", "#8f97a4"],
-            ["#7a6e65", "#96887d"],
-            ["#697d8a", "#84a0b3"],
-            ["#73605c", "#9b8278"]
-          ];
-          const [dark, light] = palettes[building.tone];
-          ctx.fillStyle = "rgba(0,0,0,0.18)";
-          ctx.fillRect(building.x + 9, building.y + 11, building.w, building.h);
-          ctx.fillStyle = dark;
-          ctx.fillRect(building.x, building.y, building.w, building.h);
-          ctx.fillStyle = light;
-          ctx.fillRect(building.x + 8, building.y + 8, building.w - 16, building.h - 16);
-
-          ctx.fillStyle = "rgba(255, 243, 190, 0.22)";
-          const cols = Math.max(2, Math.floor(building.w / 28));
-          const rows = Math.max(2, Math.floor(building.h / 28));
-          for (let ix = 0; ix < cols; ix++) {
-            for (let iy = 0; iy < rows; iy++) {
-              const wx = building.x + 14 + ix * ((building.w - 28) / cols);
-              const wy = building.y + 14 + iy * ((building.h - 28) / rows);
-              ctx.fillRect(wx, wy, 8, 10);
-            }
-          }
+          this.drawBuildingVolume(ctx, building);
         }
 
         for (const tree of this.trees) {
@@ -616,6 +679,10 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
+        ctx.fillStyle = this.damageFlash > 0 ? "#ff6b6b" : "#17324a";
+        ctx.fillRect(-8, 1, 16, 17);
+        ctx.fillStyle = this.damageFlash > 0 ? "#ff8f8f" : "#274d70";
+        ctx.fillRect(-8, -3, 16, 6);
         ctx.fillStyle = this.damageFlash > 0 ? "#ff6b6b" : "#17324a";
         ctx.fillRect(-8, -2, 16, 19);
         ctx.strokeStyle = "#dff6ff";
@@ -798,17 +865,29 @@
         ctx.translate(this.x, this.y);
         ctx.rotate(this.angle);
 
-        ctx.fillStyle = "rgba(0,0,0,0.22)";
-        ctx.fillRect(-this.w / 2 + 2, -this.h / 2 + 8, this.w, this.h);
+        ctx.fillStyle = "rgba(0,0,0,0.26)";
+        ctx.fillRect(-this.w / 2 + 3, -this.h / 2 + 10, this.w + 1, this.h);
+
+        ctx.fillStyle = "rgba(0,0,0,0.16)";
+        ctx.beginPath();
+        ctx.moveTo(-this.w / 2, this.h / 2 - 1);
+        ctx.lineTo(this.w / 2, this.h / 2 - 1);
+        ctx.lineTo(this.w / 2 - 5, this.h / 2 + 7);
+        ctx.lineTo(-this.w / 2 + 5, this.h / 2 + 7);
+        ctx.closePath();
+        ctx.fill();
 
         ctx.fillStyle = this.color;
         ctx.fillRect(-this.w / 2, -this.h / 2, this.w, this.h);
 
+        ctx.fillStyle = "rgba(255,255,255,0.16)";
+        ctx.fillRect(-this.w / 2 + 3, -this.h / 2 + 3, this.w - 6, 3);
+
         ctx.fillStyle = this.roofColor;
-        ctx.fillRect(-this.w * 0.18, -this.h * 0.36, this.w * 0.36, this.h * 0.72);
+        ctx.fillRect(-this.w * 0.18, -this.h * 0.42, this.w * 0.36, this.h * 0.76);
 
         ctx.fillStyle = "#10151a";
-        ctx.fillRect(-this.w * 0.16, -this.h * 0.24, this.w * 0.32, this.h * 0.48);
+        ctx.fillRect(-this.w * 0.16, -this.h * 0.28, this.w * 0.32, this.h * 0.56);
 
         ctx.fillStyle = "#eff3f6";
         ctx.fillRect(-this.w / 2 + 2, -this.h / 2 + 2, 6, 3);
@@ -965,9 +1044,17 @@
         ctx.beginPath();
         ctx.arc(0, -7, 5.5, 0, TAU);
         ctx.fill();
+        ctx.strokeStyle = "#18222c";
+        ctx.lineWidth = 1.4;
+        ctx.stroke();
 
+        ctx.fillStyle = "#3f5f7d";
+        ctx.fillRect(-5, 1, 10, 14);
         ctx.fillStyle = "#5a87c5";
         ctx.fillRect(-5, -2, 10, 16);
+        ctx.strokeStyle = "#dce8f4";
+        ctx.lineWidth = 1.2;
+        ctx.strokeRect(-5, -2, 10, 16);
         ctx.fillStyle = "#26303a";
         ctx.fillRect(-6, 10, 4, 10);
         ctx.fillRect(2, 10, 4, 10);
@@ -1400,22 +1487,42 @@
         this.map.draw(ctx, this.camera);
         this.mission.draw(ctx, this.time);
 
+        const renderables = [];
         for (const npc of this.npcs) {
           if (this.rectInView(npc.x - 20, npc.y - 20, 40, 40, 40)) {
-            npc.draw(ctx);
+            renderables.push({
+              y: npc.y + 20,
+              draw: () => npc.draw(ctx)
+            });
           }
         }
         for (const car of this.vehicles) {
           if (this.rectInView(car.x - 30, car.y - 30, 60, 60, 40)) {
-            car.draw(ctx);
+            renderables.push({
+              y: car.y + car.h,
+              draw: () => car.draw(ctx)
+            });
           }
         }
         for (const officer of this.police) {
           if (this.rectInView(officer.x - 30, officer.y - 30, 60, 60, 50)) {
-            officer.draw(ctx);
+            renderables.push({
+              y: officer.y + officer.h,
+              draw: () => officer.draw(ctx)
+            });
           }
         }
-        this.player.draw(ctx);
+        if (!this.player.vehicle) {
+          renderables.push({
+            y: this.player.y + 22,
+            draw: () => this.player.draw(ctx)
+          });
+        }
+
+        renderables.sort((a, b) => a.y - b.y);
+        for (const renderable of renderables) {
+          renderable.draw();
+        }
 
         ctx.restore();
         this.drawMinimap(ctx, viewW, viewH);
