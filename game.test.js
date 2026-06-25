@@ -8,7 +8,7 @@ const {
   normalizeWantedLevel,
   formatWantedStars,
   updateWantedState
-} = require("./game.js");
+} = require("./game-logic.js");
 
 test("clamp keeps values inside bounds", () => {
   assert.equal(clamp(-4, 0, 5), 0);
