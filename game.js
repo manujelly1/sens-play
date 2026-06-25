@@ -34,7 +34,7 @@
     }
 
     function normalizeWantedLevel(current, delta, maxWanted = 5) {
-      return clamp(current + delta, 0, maxWanted);
+      return clamp(current + delta, 0, maxWanted - 1);
     }
 
     function formatWantedStars(wanted, maxWanted = 5) {
