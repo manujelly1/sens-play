@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sunset Run</title>
+  <style>
+    :root {
+      --bg: #0f1114;
+      --panel: rgba(10, 14, 18, 0.82);
+      --panel-border: rgba(255, 210, 120, 0.16);
+      --text: #f6f3eb;
+      --muted: #b9c3c9;
+      --accent: #ffb347;
+      --accent-2: #69d2a2;
+      --danger: #ff6b6b;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top, #223443 0%, #0f1114 55%, #090b0d 100%);
+      color: var(--text);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+
+    canvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .hud {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .panel {
+      position: absolute;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 16px;
+      box-shadow: 0 18px 40px var(--shadow);
+      backdrop-filter: blur(10px);
+      pointer-events: auto;
+    }
+
+    .topbar {
+      top: 18px;
+      left: 18px;
+      width: min(300px, calc(100vw - 36px));
+      padding: 14px 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .city-tag {
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(255, 179, 71, 0.12);
+      color: var(--accent);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.3px;
+    }
+
+    .statline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 8px 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .value {
+      color: var(--text);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+
+    .health-wrap {
+      margin-top: 10px;
+    }
+
+    .health-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+    }
+
+    .health-bar {
+      height: 14px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .health-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, #ff6b6b 0%, #ffbf69 60%, #69d2a2 100%);
+      transition: width 0.08s linear;
+    }
+
+    .mission-box {
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(380px, calc(100vw - 36px));
+      padding: 14px 16px;
+      text-align: center;
+    }
+
+    .mission-title {
+      margin: 0 0 6px;
+      font-size: 12px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+    }
+
+    .mission-text {
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.45;
+      color: var(--text);
+    }
+
+    .mission-sub {
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .info-box {
+      left: 18px;
+      bottom: 18px;
+      width: min(335px, calc(100vw - 36px));
+      padding: 14px 16px;
+    }
+
+    @media (max-width: 900px) {
+      .topbar,
+      .mission-box,
+      .info-box {
+        left: 50%;
+        width: min(380px, calc(100vw - 24px));
+        transform: translateX(-50%);
+      }
+
+      .topbar {
+        top: 12px;
+      }
+
+      .mission-box {
+        top: 208px;
+      }
+
+      .info-box {
+        bottom: 12px;
+      }
+    }
+
+    .info-box h2 {
+      margin: 0 0 10px;
+      font-size: 13px;
+      color: var(--accent-2);
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+    }
+
+    .info-box p {
+      margin: 5px 0;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    .key {
+      display: inline-block;
+      min-width: 24px;
+      padding: 2px 7px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      text-align: center;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+
+    .toast {
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: 280px;
+      padding: 13px 14px;
+      border-radius: 16px;
+      background: rgba(16, 22, 28, 0.88);
+      border: 1px solid rgba(105, 210, 162, 0.14);
+      box-shadow: 0 18px 40px var(--shadow);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.45;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .wanted {
+      color: #ffd166;
+      letter-spacing: 2px;
+      text-shadow: 0 0 12px rgba(255, 209, 102, 0.35);
+    }
+
+    .speed {
+      color: #8ed8ff;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <div class="hud">
+    <div class="panel topbar">
+      <div class="brand">
+        <h1>Sunset Run</h1>
+        <div class="city-tag">Oceanview</div>
+      </div>
+      <div class="statline">
+        <span>Money</span>
+        <span class="value" id="money">$0</span>
+      </div>
+      <div class="statline">
+        <span>Wanted</span>
+        <span class="value wanted" id="wanted">☆☆☆☆☆</span>
+      </div>
+      <div class="statline">
+        <span>Speed</span>
+        <span class="value speed" id="speed">0 km/h</span>
+      </div>
+      <div class="health-wrap">
+        <div class="health-label">
+          <span>Health</span>
+          <span id="healthValue">100 / 100</span>
+        </div>
+        <div class="health-bar">
+          <div class="health-fill" id="healthFill"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel mission-box">
+      <p class="mission-title">Current Job</p>
+      <p class="mission-text" id="missionText">Find the package and deliver it across the city.</p>
+      <div class="mission-sub" id="missionSub">Drive carefully. Police attention fades if you stay away.</div>
+    </div>
+
+    <div class="panel info-box">
+      <h2>Controls</h2>
+      <p><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> or arrows to move and drive</p>
+      <p><span class="key">E</span> Enter or exit nearby cars</p>
+      <p>Hit civilians or vehicles and your wanted level rises. Evade police long enough to cool it down.</p>
+      <p>Orange marker: package. Green marker: delivery point.</p>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
