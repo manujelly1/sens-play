@@ -3,9 +3,13 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "build": "esbuild game-src.js --bundle --format=iife --platform=browser --target=es2018 --outfile=game.js",
     "test": "node --test"
   },
   "dependencies": {
     "three": "^0.185.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.1"
   }
 }
