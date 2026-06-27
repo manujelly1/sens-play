@@ -1,0 +1,6 @@
+[build]
+  command = "npm test && npm run build --if-present"
+  publish = "."
+
+[build.environment]
+  NODE_VERSION = "22"

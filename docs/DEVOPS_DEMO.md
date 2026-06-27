@@ -143,3 +143,68 @@ Le message à faire passer :
 - la feature peut être "visuellement présente" sur les deux branches
 - seule la qualité vérifiée par les tests permet de distinguer un changement livrable d'un changement risqué
 - le pipeline DevOps sert précisément à empêcher qu'un état "red" parte plus loin dans la chaîne
+
+## Déploiement Netlify
+
+Le dépôt peut s'appuyer sur le pipeline natif Netlify.
+
+Le dépôt contient la configuration suivante :
+
+- `netlify.toml`
+
+Comportement prévu :
+
+- `main`
+  - déploiement production via le pipeline natif Netlify
+- `feature/devops-green`
+  - branch deploy Netlify dédié pour la démo green
+- `feature/devops-red`
+  - branch deploy Netlify dédié pour la démo red
+
+La config versionnée indique simplement à Netlify de publier la racine du projet :
+
+```toml
+[build]
+  command = "npm test && npm run build --if-present"
+  publish = "."
+```
+
+Effet recherché :
+
+- Netlify lance les tests avant le déploiement
+- si les tests échouent, le déploiement est bloqué
+- si un script `build` existe sur la branche, il est lancé après les tests
+
+### Réglage Netlify recommandé
+
+Dans Netlify, activer les branch deploys pour :
+
+- `feature/devops-green`
+- `feature/devops-red`
+
+Si vous préférez une règle plus large pour d'autres démos, vous pouvez aussi utiliser :
+
+- `feature/*`
+
+Pour la présentation, les deux branches de démonstration sont plus parlantes quand elles sont configurées explicitement :
+
+- `feature/devops-green`
+  - les tests passent, le déploiement peut aboutir
+- `feature/devops-red`
+  - les tests échouent, Netlify stoppe le pipeline avant publication
+
+### Comment corriger une branche red côté déploiement
+
+Le déploiement ne doit pas partir tant que les tests échouent.
+
+Donc pour permettre le déploiement de `feature/devops-red`, il faut d'abord corriger la régression dans :
+
+- `game-logic.js`
+
+Puis relancer :
+
+```bash
+npm test
+```
+
+Une fois les tests repassés au vert, la branche peut repartir dans le pipeline natif Netlify.
