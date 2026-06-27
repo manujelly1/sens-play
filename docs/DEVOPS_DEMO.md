@@ -10,7 +10,6 @@ Cette démo montre une évolution fonctionnelle identique sur deux branches `fea
 L'idée est de montrer qu'un pipeline DevOps ne valide pas "une intention", mais un état réel du code.
 
 ## Etat des branches
-
 - `main`
   - base propre pour la présentation
   - les tests passent
