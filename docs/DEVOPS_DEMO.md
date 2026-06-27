@@ -144,3 +144,29 @@ Le message à faire passer :
 - la feature peut être "visuellement présente" sur les deux branches
 - seule la qualité vérifiée par les tests permet de distinguer un changement livrable d'un changement risqué
 - le pipeline DevOps sert précisément à empêcher qu'un état "red" parte plus loin dans la chaîne
+
+## Déploiement Netlify
+
+Cette branche est compatible avec le pipeline natif Netlify.
+
+Le dépôt contient la configuration suivante :
+
+- `netlify.toml`
+
+La commande versionnée pour Netlify est :
+
+```toml
+[build]
+  command = "npm test && npm run build --if-present"
+  publish = "."
+```
+
+Pour la démo, activer un branch deploy explicite sur :
+
+- `feature/devops-green`
+
+Résultat attendu sur cette branche :
+
+- les tests passent
+- le build Webpack passe
+- le déploiement preview peut être publié
