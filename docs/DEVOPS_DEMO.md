@@ -129,6 +129,7 @@ Le chargement du jeu 3D a été rendu compatible `file://` grâce à un bundle n
 
 - source maintenable : `game-src.js`
 - bundle exécuté par le navigateur : `game.js`
+- bundler utilisé : `webpack`
 
 Si la source 3D est modifiée sur une branche feature, reconstruire le bundle avec :
 
