@@ -35,12 +35,13 @@
   }
 
   function normalizeWantedLevel(current, delta, maxWanted = 5) {
-    return clamp(current + delta, 0, maxWanted - 1);
+    return clamp(current + delta, 0, maxWanted);
   }
 
   function formatWantedStars(wanted, maxWanted = 5) {
     const safeWanted = clamp(Math.round(wanted), 0, maxWanted);
-    return "★".repeat(safeWanted) + "☆".repeat(maxWanted - safeWanted);
+    const visibleWanted = Math.max(0, safeWanted - 1);
+    return "★".repeat(visibleWanted) + "☆".repeat(maxWanted - visibleWanted);
   }
 
   function updateWantedState(wanted, evadeTimer, nearestPoliceDistance, dt, decayDistance = 380, decaySeconds = 10) {

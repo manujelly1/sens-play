@@ -59,7 +59,7 @@ npm test
 
 ## Pourquoi la branche red échoue
 
-La branche `feature/devops-red` contient une régression volontaire dans la logique du niveau de recherche.
+La branche `feature/devops-red` contient une régression volontaire dans l'affichage des étoiles du niveau de recherche.
 
 Fichier concerné :
 
@@ -67,20 +67,23 @@ Fichier concerné :
 
 Fonction concernée :
 
-- `normalizeWantedLevel`
+- `formatWantedStars`
 
 Version cassée :
 
 ```js
-function normalizeWantedLevel(current, delta, maxWanted = 5) {
-  return clamp(current + delta, 0, maxWanted - 1);
+function formatWantedStars(wanted, maxWanted = 5) {
+  const safeWanted = clamp(Math.round(wanted), 0, maxWanted);
+  const visibleWanted = Math.max(0, safeWanted - 1);
+  return "★".repeat(visibleWanted) + "☆".repeat(maxWanted - visibleWanted);
 }
 ```
 
 Le bug est simple :
 
-- le niveau maximum devient `4` au lieu de `5`
-- le test attend bien une borne max à `5`
+- l'interface affiche toujours une étoile de moins que prévu
+- par exemple, un wanted level à `3` montre `★★☆☆☆` au lieu de `★★★☆☆`
+- c'est beaucoup plus parlant en présentation qu'une borne interne incorrecte
 
 ## Comment corriger la branche red
 
@@ -89,16 +92,19 @@ Le bug est simple :
 Dans `feature/devops-red`, remplacer :
 
 ```js
-function normalizeWantedLevel(current, delta, maxWanted = 5) {
-  return clamp(current + delta, 0, maxWanted - 1);
+function formatWantedStars(wanted, maxWanted = 5) {
+  const safeWanted = clamp(Math.round(wanted), 0, maxWanted);
+  const visibleWanted = Math.max(0, safeWanted - 1);
+  return "★".repeat(visibleWanted) + "☆".repeat(maxWanted - visibleWanted);
 }
 ```
 
 par :
 
 ```js
-function normalizeWantedLevel(current, delta, maxWanted = 5) {
-  return clamp(current + delta, 0, maxWanted);
+function formatWantedStars(wanted, maxWanted = 5) {
+  const safeWanted = clamp(Math.round(wanted), 0, maxWanted);
+  return "★".repeat(safeWanted) + "☆".repeat(maxWanted - safeWanted);
 }
 ```
 
