@@ -1,0 +1,268 @@
+CONDUCTEUR DEMO DEVOPS
+
+Objectif
+
+Montrer un scenario simple et parlant :
+
+- au depart, `main` et `dev` portent encore la version 2D
+- la 3D est en cours sur deux branches feature
+- `feature/devops-red` contient un bug visible des l'ouverture
+- `feature/devops-green` contient la version corrigee
+- une fois validee, la feature passe par `dev`, puis par `main`, puis en production
+
+Message principal
+
+- une branche feature peut etre testee et deployee sans toucher la prod
+- le pipeline sert a bloquer un changement non livrable
+- la promotion vers `main` est le vrai moment de mise en production
+
+Branches a raconter
+
+- `main`
+  - version 2D
+  - branche de production
+- `dev`
+  - version 2D
+  - branche d'integration
+- `feature/devops-red`
+  - version 3D
+  - bug visible sur les etoiles du wanted
+- `feature/devops-green`
+  - version 3D
+  - bug corrige
+
+Deroule recommande
+
+1. Poser le contexte
+
+Phrase d'ouverture :
+"Je vais montrer comment un changement passe d'une version stable a une nouvelle version, sans casser la production."
+
+A dire :
+
+- `main` correspond a la prod
+- `dev` sert d'etape intermediaire d'integration
+- les branches `feature/*` servent a preparer les evolutions
+
+2. Montrer l'etat de depart sur main
+
+Commande :
+
+git switch main
+open index.html
+
+Ce qu'il faut montrer :
+
+- l'application est en 2D
+- c'est l'etat stable de reference
+
+Commentaire oral :
+"Ici, on est sur la base stable. C'est ce que je considere comme l'etat de production ou en tout cas la branche de reference."
+
+3. Montrer l'etat de depart sur dev
+
+Commande :
+
+git switch dev
+open index.html
+
+Ce qu'il faut montrer :
+
+- l'application est encore en 2D
+- `dev` n'a pas encore recu la nouvelle version 3D
+
+Commentaire oral :
+"Dev est encore alignee avec la version 2D. Cela veut dire que la nouvelle evolution n'a pas encore ete integree."
+
+4. Expliquer le changement en preparation
+
+A dire :
+
+- la nouvelle evolution est une version 3D
+- elle existe sur deux branches feature
+- une branche est mauvaise, l'autre est bonne
+
+Phrase simple :
+"Les deux branches montrent la meme intention produit, mais pas la meme qualite de livraison."
+
+5. Montrer red en local
+
+Commande :
+
+git switch feature/devops-red
+npm test
+open index.html
+
+Ce qu'il faut montrer :
+
+- l'application passe en 3D
+- donc la feature semble bien presente
+- mais les tests echouent
+- des l'ouverture, le wanted affiche :
+  ★☆☆☆☆
+  alors qu'il devrait afficher :
+  ☆☆☆☆☆
+
+Commentaire oral :
+"Le bug est visible tout de suite. Je n'ai meme pas besoin de jouer : l'interface montre deja un mauvais etat."
+
+Message a faire passer :
+
+- la feature est impressionnante visuellement
+- mais elle n'est pas livrable
+- le pipeline a raison de la bloquer
+
+6. Expliquer pourquoi red est bloquee
+
+A dire :
+
+- la regression est volontaire
+- elle touche `formatWantedStars`
+- elle force l'affichage d'au moins une etoile
+- le test detecte ce defaut des l'etat initial
+
+Phrase simple :
+"Le pipeline ne protege pas seulement du code cassé. Il protege aussi de petits defauts visibles par l'utilisateur."
+
+7. Montrer green
+
+Commande :
+
+git switch feature/devops-green
+npm test
+open index.html
+
+Ce qu'il faut montrer :
+
+- l'application est aussi en 3D
+- les tests passent
+- des l'ouverture, le wanted affiche bien :
+  ☆☆☆☆☆
+
+Commentaire oral :
+"On a la meme evolution 3D, mais cette fois elle est techniquement validee et visuellement correcte."
+
+Message a faire passer :
+
+- `red` = changement risque
+- `green` = changement promouvable
+
+8. Expliquer le passage par dev
+
+A dire :
+
+- tant que la feature est sur une branche feature, elle reste en zone de verification
+- quand elle est consideree comme bonne, elle peut etre mergee vers `dev`
+- `dev` devient alors l'etat d'integration de l'equipe
+
+Phrase simple :
+"Dev sert de sas avant la branche de production."
+
+9. Expliquer le passage en production
+
+A dire :
+
+- une fois la validation terminee, on merge `dev` vers `main`
+- c'est ce merge qui fait passer la 3D dans la branche de production
+- a ce moment-la, `main` ne sera plus en 2D, mais en 3D avec le bon nombre d'etoiles
+
+Phrase de conclusion :
+"Le but du pipeline est de faire arriver en production la bonne version 3D, pas juste la premiere version qui fonctionne visuellement."
+
+10. Fin de demo ideale
+
+Scenario final a raconter :
+
+- au debut :
+  - `main` = 2D
+  - `dev` = 2D
+- ensuite :
+  - `red` = 3D mais fausse
+  - `green` = 3D correcte
+- enfin :
+  - `green` est promue
+  - `dev` passe en 3D
+  - puis `main` passe en 3D
+  - la production recoit la bonne version
+
+Ordre conseille pendant la presentation
+
+1. `main` en 2D
+2. `dev` en 2D
+3. explication du pipeline
+4. `feature/devops-red` en 3D avec bug
+5. `feature/devops-green` en 3D corrigee
+6. explication du merge vers `dev`
+7. explication du merge vers `main`
+8. conclusion sur la production
+
+Timing conseille
+
+- contexte et branches : 2 min
+- `main` + `dev` en 2D : 2 min
+- `red` : 3 min
+- `green` : 2 min
+- promotion vers `dev` puis `main` : 1 a 2 min
+
+Total conseille :
+
+- 10 a 12 minutes
+
+Commandes utiles
+
+Etat de depart :
+
+git switch main
+open index.html
+
+git switch dev
+open index.html
+
+Version red :
+
+git switch feature/devops-red
+npm test
+open index.html
+
+Version green :
+
+git switch feature/devops-green
+npm test
+open index.html
+
+Option si tu veux finir la demo en mode promotion :
+
+git switch dev
+git merge feature/devops-green
+
+git switch main
+git merge dev
+
+Option si tu veux pousser ensuite :
+
+git push origin dev
+git push origin main
+
+Phrases courtes pretes a l'emploi
+
+- "Main represente la production."
+- "Dev represente l'integration."
+- "Feature represente l'experimentation."
+- "Red montre une feature visible mais non livrable."
+- "Green montre une feature visible et validable."
+- "Le merge vers main est le passage officiel en production."
+
+Etat Git de reference
+
+- `main` : 0fb0b7f
+- `dev` : 957a0a6
+- `feature/devops-green` : e4362e7
+- `feature/devops-red` : 2ab49f2
+
+Plan B si tu dois aller vite
+
+- montrer `main` en 2D
+- montrer `feature/devops-red` en 3D avec `★☆☆☆☆` des l'ouverture
+- montrer `feature/devops-green` en 3D avec `☆☆☆☆☆`
+- conclure :
+  "la bonne version 3D va vers dev, puis main, puis la prod"

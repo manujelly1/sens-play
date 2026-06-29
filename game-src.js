@@ -866,6 +866,7 @@ class Vehicle {
       if (this.driver && impact > 120) {
         this.game.player.takeDamage((impact - 120) * 0.04);
       }
+
       if (this.ai !== "parked") {
         this.route = [];
       }
