@@ -17,6 +17,7 @@ L'idée est de montrer qu'un pipeline DevOps ne valide pas "une intention", mais
   - version 3D avec `Three.js`
   - ouverture directe possible via `index.html`
   - les tests passent
+  - les étoiles du wanted reflètent correctement le niveau affiché
 - `feature/devops-red`
   - même évolution 3D avec `Three.js`
   - ouverture directe possible via `index.html`
@@ -36,6 +37,7 @@ Résultat attendu :
 
 - l'application s'ouvre en 3D
 - tous les tests passent
+- un wanted level à `3` affiche bien `★★★☆☆`
 
 ### 2. Montrer la branche red
 
@@ -169,3 +171,11 @@ Résultat attendu sur cette branche :
 - les tests passent
 - le build Webpack passe
 - le déploiement preview peut être publié
+
+## Point de comparaison pour la démo
+
+Le contraste à montrer avec `feature/devops-red` est très visuel :
+
+- ici, l'UI des étoiles est correcte
+- sur `red`, une étoile manque systématiquement
+- cela permet d'expliquer qu'un pipeline peut bloquer un changement qui semble petit, mais qui est immédiatement visible côté utilisateur
