@@ -40,7 +40,7 @@
 
   function formatWantedStars(wanted, maxWanted = 5) {
     const safeWanted = clamp(Math.round(wanted), 0, maxWanted);
-    const visibleWanted = Math.max(0, safeWanted - 1);
+    const visibleWanted = Math.max(1, safeWanted);
     return "★".repeat(visibleWanted) + "☆".repeat(maxWanted - visibleWanted);
   }
 

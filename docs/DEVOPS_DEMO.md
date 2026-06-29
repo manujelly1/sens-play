@@ -21,6 +21,7 @@ L'idée est de montrer qu'un pipeline DevOps ne valide pas "une intention", mais
   - même évolution 3D avec `Three.js`
   - ouverture directe possible via `index.html`
   - un test échoue volontairement
+  - l'interface affiche déjà une étoile alors que le wanted level réel est à zéro
 
 ## Commandes de démo
 
@@ -49,6 +50,7 @@ Résultat attendu :
 
 - l'application s'ouvre aussi en 3D
 - un test échoue
+- l'interface affiche `★☆☆☆☆` dès l'ouverture alors qu'il ne devrait y avoir aucune étoile
 
 ### 3. Revenir au point neutre
 
@@ -74,15 +76,15 @@ Version cassée :
 ```js
 function formatWantedStars(wanted, maxWanted = 5) {
   const safeWanted = clamp(Math.round(wanted), 0, maxWanted);
-  const visibleWanted = Math.max(0, safeWanted - 1);
+  const visibleWanted = Math.max(1, safeWanted);
   return "★".repeat(visibleWanted) + "☆".repeat(maxWanted - visibleWanted);
 }
 ```
 
 Le bug est simple :
 
-- l'interface affiche toujours une étoile de moins que prévu
-- par exemple, un wanted level à `3` montre `★★☆☆☆` au lieu de `★★★☆☆`
+- l'interface affiche au minimum une étoile même quand le wanted level vaut `0`
+- dès le lancement, on voit `★☆☆☆☆` au lieu de `☆☆☆☆☆`
 - c'est beaucoup plus parlant en présentation qu'une borne interne incorrecte
 
 ## Comment corriger la branche red
@@ -94,7 +96,7 @@ Dans `feature/devops-red`, remplacer :
 ```js
 function formatWantedStars(wanted, maxWanted = 5) {
   const safeWanted = clamp(Math.round(wanted), 0, maxWanted);
-  const visibleWanted = Math.max(0, safeWanted - 1);
+  const visibleWanted = Math.max(1, safeWanted);
   return "★".repeat(visibleWanted) + "☆".repeat(maxWanted - visibleWanted);
 }
 ```
