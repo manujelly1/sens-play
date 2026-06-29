@@ -248,6 +248,35 @@
     .speed {
       color: #8ed8ff;
     }
+
+    .minimap-box {
+      top: 18px;
+      right: 18px;
+      width: 216px;
+      padding: 10px;
+    }
+
+    .minimap-box canvas {
+      width: 196px;
+      height: 196px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    @media (max-width: 900px) {
+      .minimap-box {
+        right: 12px;
+        top: 12px;
+        width: 156px;
+        padding: 8px;
+      }
+
+      .minimap-box canvas {
+        width: 140px;
+        height: 140px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -288,6 +317,10 @@
       <div class="mission-sub" id="missionSub">Drive carefully. Police attention fades if you stay away.</div>
     </div>
 
+    <div class="panel minimap-box">
+      <canvas id="minimap" width="196" height="196"></canvas>
+    </div>
+
     <div class="panel info-box">
       <h2>Controls</h2>
       <p><span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> or arrows to move and drive</p>
@@ -299,6 +332,7 @@
     <div class="toast" id="toast"></div>
   </div>
 
+  <script src="game-logic.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

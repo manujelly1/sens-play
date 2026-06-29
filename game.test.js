@@ -8,7 +8,7 @@ const {
   normalizeWantedLevel,
   formatWantedStars,
   updateWantedState
-} = require("./game.js");
+} = require("./game-logic.js");
 
 test("clamp keeps values inside bounds", () => {
   assert.equal(clamp(-4, 0, 5), 0);
@@ -33,7 +33,7 @@ test("normalizeWantedLevel respects lower and upper bounds", () => {
   assert.equal(normalizeWantedLevel(4, 3), 5);
 });
 
-test("formatWantedStars renders filled then empty stars", () => {
+test("formatWantedStars keeps the visible stars aligned with the wanted level", () => {
   assert.equal(formatWantedStars(0), "☆☆☆☆☆");
   assert.equal(formatWantedStars(3), "★★★☆☆");
   assert.equal(formatWantedStars(8), "★★★★★");

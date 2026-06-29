@@ -39,7 +39,7 @@ Résultat attendu :
 
 - l'application s'ouvre en 3D
 - tous les tests passent
-- un wanted level à `3` affiche bien `★★★☆☆`
+- au lancement, le wanted affiche bien `☆☆☆☆☆`
 
 ### 2. Montrer la branche red
 
@@ -139,6 +139,7 @@ Le chargement du jeu 3D a été rendu compatible `file://` grâce à un bundle n
 
 - source maintenable : `game-src.js`
 - bundle exécuté par le navigateur : `game.js`
+- bundler utilisé : `webpack`
 
 Si la source 3D est modifiée sur une branche feature, reconstruire le bundle avec :
 
